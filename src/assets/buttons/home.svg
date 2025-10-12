@@ -1,9 +1,0 @@
-<svg width="59" height="59" viewBox="0 0 59 59" fill="none" xmlns="http://www.w3.org/2000/svg">
-<circle cx="29.5" cy="29.5" r="29" stroke="white"/>
-<line x1="14.9304" y1="30.791" x2="30.5073" y2="14.9484" stroke="#F8FBF0" stroke-width="3"/>
-<line x1="28.4923" y1="14.9484" x2="44.143" y2="30.8628" stroke="#F8FBF0" stroke-width="3"/>
-<mask id="path-4-inside-1_1010_9" fill="white">
-<path d="M18 27.0001H41V43.0001H18V27.0001Z"/>
-</mask>
-<path d="M41 43.0001V46.0001H44V43.0001H41ZM18 43.0001H15V46.0001H18V43.0001ZM41 27.0001H38V43.0001H41H44V27.0001H41ZM41 43.0001V40.0001H18V43.0001V46.0001H41V43.0001ZM18 43.0001H21V27.0001H18H15V43.0001H18Z" fill="#F8FBF0" mask="url(#path-4-inside-1_1010_9)"/>
-</svg>

@@ -1,99 +1,110 @@
 // src/pages/MainPage.styles.js
-import styled, { css } from 'styled-components';
-import { Link } from 'react-router-dom';
+import styled from 'styled-components';
 
 export const PageContainer = styled.div`
   display: flex;
   flex-direction: column;
+  align-items: center; /* 캘린더 등 내부 요소를 중앙 정렬 */
+`;
+
+export const MonthControl = styled.div`
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  padding: 20px;
-  gap: 20px;
-  padding-bottom: 316px;
-`;
-
-export const CalendarContainer = styled.div`
-  background-color: #F6F6F8;
-  border-radius: 13px;
-  width: 443px;
-  padding: 20px;
+  padding: 20px 40px;
+  width: 100%;
   box-sizing: border-box;
-  min-height: 400px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
 `;
 
-export const WeekContainer = styled.div`
-  display: flex;
-  gap: 10px;
+export const MonthText = styled.h2`
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
 `;
 
-export const DayCell = styled.div`
-  width: 50px;
-  height: 50px;
-  border: 1px solid #ccc;
+export const ArrowButton = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+`;
+
+// Calendar 컴포넌트를 중앙 정렬하기 위한 래퍼
+export const CalendarWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+`;
+
+export const BottomContainer = styled.div`
+  width: 100%;
+  height: 300px;
+  background-color: #EBF6D8;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+`;
+
+
+// --- 기록 없는 날짜 선택 시 (Main_b) ---
+export const AddButtonWrapper = styled.div`
+  width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
+`;
+
+export const AddButton = styled.img`
+  width: 80px;
+  height: 80px;
   cursor: pointer;
+`;
+
+// --- 기록 있는 날짜 선택 시 (Main_a) ---
+export const RecordInfoContainer = styled.div`
+  width: 100%;
+  height: 100%;
+  padding-top: 20px;
   box-sizing: border-box;
-  background-color: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
 
-  /* 날짜가 없는 칸 */
-  ${({ $isEmpty }) => $isEmpty && css`
-    border: none;
-    cursor: default;
-  `}
+export const SelectedDateText = styled.p`
+  width: 345px;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: left;
+  margin-bottom: 10px;
+`;
 
-  /* 선택된 날짜 */
-  ${({ $isSelected }) => $isSelected && css`
-    border: 2px solid #AAD786;
-    background-color: #EBF6D8;
-  `}
+export const InfoBox = styled.div`
+  width: 345px;
+  height: 198px;
+  background-color: white;
+  border-radius: 13px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+`;
+
+export const EmotionRow = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  margin-bottom: 20px;
 `;
 
 export const EmotionIcon = styled.img`
-  width: 80%;
-  height: 80%;
+  width: 60px;
+  height: 60px;
 `;
 
-export const BottomBox = styled.div`
-  width: 498px;
-  height: 296px;
-  background-color: #DDF1C0;
-  position: fixed;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 100;
-`;
-
-export const BottomBoxContent = styled.div`
-  position: relative;
-  width: 100%;
-  height: 100%;
-`;
-
-export const StartRecordButtonLink = styled(Link)`
-  position: absolute;
-  left: 204px;
-  top: 103px;
-  width: 90px;
-  height: 90px;
-`;
-
-export const ViewDiaryButtonLink = styled(Link)`
-  position: absolute;
-  left: 41px;
-  top: 210px;
-  width: 200px;
-  height: 49px;
-`;
-
-export const EditDiaryButtonLink = styled(Link)`
-  position: absolute;
-  left: 255px;
-  top: 210px;
-  width: 200px;
-  height: 49px;
+export const DiaryButton = styled.img`
+  cursor: pointer;
 `;

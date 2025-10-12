@@ -1,34 +1,36 @@
 // src/pages/RecordingPage.jsx
 import { useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Layout from '../components/Layout';
-import Button from '../components/Button';
-import endChatIcon from '../assets/buttons/end_chat.svg';
-import * as S from './RecordingPage.styles'; // 스타일 파일 불러오기
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import * as S from './RecordingPage.styles.js';
+
+import Layout from '../components/Layout/Layout';
+import avatarIcon from '../assets/icons/avatar.svg';
+import endRecordingButtonImg from '../assets/buttons/endrecordingbutton.svg';
 
 function RecordingPage() {
+  const { date } = useParams();
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const navigate = useNavigate();
 
-  const getCamera = async () => {
-    try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: false,
-      });
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
-      }
-      streamRef.current = mediaStream;
-    } catch (err) {
-      console.error("카메라 접근 에러:", err);
-      alert("카메라에 접근할 수 없습니다.");
-    }
-  };
-
+  // 카메라 켜기
   useEffect(() => {
+    const getCamera = async () => {
+      try {
+        const mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        if (videoRef.current) {
+          videoRef.current.srcObject = mediaStream;
+        }
+        streamRef.current = mediaStream;
+      } catch (err) {
+        console.error("카메라 접근 에러:", err);
+        alert("카메라에 접근할 수 없습니다.");
+      }
+    };
+
     getCamera();
+
+    // 페이지를 떠날 때 카메라 끄기
     return () => {
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(track => track.stop());
@@ -36,28 +38,29 @@ function RecordingPage() {
     };
   }, []);
 
-  const handleStopCamera = () => {
+  // 녹화 종료 버튼 클릭 핸들러
+  const handleEndRecording = () => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
     }
-    navigate('/after-record');
+    navigate(`/after-record/${date}`);
   };
 
   return (
-    <Layout headerType="analysis">
-      <S.ContentContainer>
-        <S.VideoContainer>
-          <S.UserVideoWrapper>
-            <S.LiveVideo ref={videoRef} autoPlay playsInline />
-          </S.UserVideoWrapper>
-          <S.AvatarVideoWrapper>
-            <p>아바타 영상 화면</p>
-          </S.AvatarVideoWrapper>
-        </S.VideoContainer>
+    <Layout>
+        <S.ContentContainer>
 
-        <S.EndChatButtonWrapper>
-          <Button onClick={handleStopCamera} imageSrc={endChatIcon} altText="채팅 종료" />
-        </S.EndChatButtonWrapper>
+      <S.UserVideoWrapper>
+        <S.LiveVideo ref={videoRef} autoPlay playsInline muted />
+      </S.UserVideoWrapper>
+
+      <S.AvatarVideoWrapper>
+        <S.AvatarImage src={avatarIcon} alt="아바타" />
+      </S.AvatarVideoWrapper>
+
+      <S.EndRecordingButtonWrapper onClick={handleEndRecording}>
+        <img src={endRecordingButtonImg} alt="기록 끝" />
+      </S.EndRecordingButtonWrapper>
       </S.ContentContainer>
     </Layout>
   );

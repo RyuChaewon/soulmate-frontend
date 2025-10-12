@@ -5,33 +5,31 @@ import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import './index.css';
 
-// 페이지 컴포넌트들을 모두 불러옵니다.
+// 모든 페이지 컴포넌트들을 불러옵니다.
 import LoginPage from './pages/LoginPage';
+import JoinPage from './pages/JoinPage';
 import MainPage from './pages/MainPage';
-import DailyPage from './pages/DailyPage';
-import MenuPage from './pages/MenuPage';
-import BeforeRecordPage from './pages/BeforeRecordPage';
+import DayPage from './pages/DayPage'; // DailyPage -> DayPage로 수정
+import BeforeRecordingPage from './pages/BeforeRecordingPage';
 import RecordingPage from './pages/RecordingPage';
-import AfterRecordPage from './pages/AfterRecordPage';
-import DiaryPage from './pages/DiaryPage';
-import AnalysisPage from './pages/AnalysisPage';
-import SearchPage from './pages/SearchPage';
-import EditDiaryPage from './pages/EditDiaryPage';
+import AfterRecordingPage from './pages/AfterRecordingPage';
+// EditDiaryPage와 SearchPage는 아직 만들지 않았으므로 주석 처리
+// import EditDiaryPage from './pages/EditDiaryPage';
+// import SearchPage from './pages/SearchPage';
 
 // 라우터 설정 (페이지 경로 연결)
 const router = createBrowserRouter([
   { path: "/login", element: <LoginPage /> },
   { path: "/", element: <MainPage /> },
-  { path: "/daily/:date", element: <DailyPage /> }, // URL에 날짜를 포함하는 경로
-  { path: "/daily", element: <DailyPage /> }, // 날짜가 없는 기본 경로도 추가
-  { path: "/menu", element: <MenuPage /> },
-  { path: "/before-record", element: <BeforeRecordPage /> },
-  { path: "/recording", element: <RecordingPage /> },
-  { path: "/after-record", element: <AfterRecordPage /> },
-  { path: "/diary", element: <DiaryPage /> },
-  { path: "/analysis", element: <AnalysisPage /> },
-  { path: "/search", element: <SearchPage /> },
-  { path: "/edit-diary", element: <EditDiaryPage /> },
+  { path: "/join", element: <JoinPage /> },
+  
+  // --- ↓↓↓ 누락된 경로들을 모두 추가합니다 ↓↓↓ ---
+  { path: "/day/:date", element: <DayPage /> }, // day로 수정
+  { path: "/before-record/:date", element: <BeforeRecordingPage /> },
+  { path: "/recording/:date", element: <RecordingPage /> },
+  { path: "/after-record/:date", element: <AfterRecordingPage /> },
+  // { path: "/search", element: <SearchPage /> },
+  // { path: "/edit-diary", element: <EditDiaryPage /> },
 ]);
 
 // 최종 렌더링

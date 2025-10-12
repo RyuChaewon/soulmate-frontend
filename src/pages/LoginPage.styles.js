@@ -1,57 +1,96 @@
 // src/pages/LoginPage.styles.js
 import styled from 'styled-components';
 
-export const Wrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background-color: #f8f9fa;
-`;
-
 export const PageContainer = styled.div`
-  width: 498px;
-  height: 1080px;
+  width: 393px;
+  height: 852px;
+  background-color: #ffffff;
   margin: 0 auto;
-  background-color: white;
   position: relative;
-  overflow: hidden;
-`;
-
-export const Logo = styled.img`
-  position: absolute;
-  left: 104px;
-  top: 146px;
-  width: 291px;
-  height: 56px;
-`;
-
-export const Avatar = styled.img`
-  position: absolute;
-  left: 138px;
-  top: 346px;
-  width: 222px;
-  height: 233px;
-`;
-
-export const BottomSheet = styled.div`
-  position: absolute;
-  left: 0px;
-  top: 580px;
-  bottom: 0px;
-  width: 498px;
-  background-color: #EBF6D8;
-  border-top-left-radius: 28px;
-  border-top-right-radius: 28px;
-  padding: 40px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
+  overflow: hidden;
+`;
+
+export const TopContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 100px;
+`;
+
+export const Title = styled.img`
+  width: 250px;
+`;
+
+export const Avatar = styled.img`
+  width: 150px;
+  margin-top: 40px;
+`;
+
+export const BottomSheet = styled.form`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 400px;
+  background-color: #EBF6D8;
+  border-top-left-radius: 28px;
+  border-top-right-radius: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 30px;
+  box-sizing: border-box;
   gap: 15px;
 `;
 
-export const SocialButton = styled.img`
-  width: 445px;
-  height: 60px;
+// InputWrapper를 원래의 단순한 스타일로 되돌립니다.
+export const InputWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  width: 100%;
+`;
+
+export const Label = styled.label`
+  font-size: 16px;
+  font-weight: bold;
+  width: 40px;
+  text-align: left;
+  color: #50AB75;
+`;
+
+export const Input = styled.input`
+  flex: 1;
+  height: 42px;
+  border: 3px solid #50AB75;
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 0 15px;
+  font-size: 16px;
+  box-sizing: border-box;
+`;
+
+// ErrorText 스타일을 삭제했습니다.
+
+export const LoginButton = styled.button`
+  width: 100%;
+  height: 50px;
+  background-color: #AAD786;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
   cursor: pointer;
+  margin-top: 20px;
+`;
+
+export const EmailStartLink = styled.a`
+  color: #555;
+  font-size: 14px;
+  text-decoration: underline;
+  cursor: pointer;
+  margin-top: 10px;
 `;
