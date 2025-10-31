@@ -2,20 +2,26 @@
 import { useState, useEffect, useCallback } from 'react';
 import * as S from './Calendar.styles';
 
-// 모든 감정 아이콘 import
-import angryIcon from '../../assets/emotions/angry.png';
-import disgustedIcon from '../../assets/emotions/disgusted.png';
-import fearIcon from '../../assets/emotions/fear.png';
 import happyIcon from '../../assets/emotions/happy.png';
-import hateIcon from '../../assets/emotions/hate.png';
+import angryIcon from '../../assets/emotions/angry.png';
+import anxietyIcon from '../../assets/emotions/anxiety.png';
+import neutralIcon from '../../assets/emotions/neutral.png';
+import panicIcon from '../../assets/emotions/panic.png';
 import sadIcon from '../../assets/emotions/sad.png';
-import surprisedIcon from '../../assets/emotions/surprised.png';
+import woundIcon from '../../assets/emotions/wound.png';
+// --- ↑↑↑ 여기까지 ---
 
-// 감정 이름을 아이콘 파일에 매핑
+// --- ↓↓↓ [수정] 새로운 감정 아이콘 매핑 객체 ↓↓↓ ---
 const emotionIcons = {
-  angry: angryIcon, disgusted: disgustedIcon, fear: fearIcon,
-  happy: happyIcon, hate: hateIcon, sad: sadIcon, surprised: surprisedIcon,
+  happy: happyIcon,
+  angry: angryIcon,
+  anxiety: anxietyIcon,
+  neutral: neutralIcon,
+  panic: panicIcon,
+  sad: sadIcon,
+  wound: woundIcon,
 };
+// --- ↑↑↑ 여기까지 ---
 
 function Calendar({ date, onDayClick, records, isLoading }) {
   const [selectedDay, setSelectedDay] = useState(null);

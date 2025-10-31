@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 
 export const ContentContainer = styled.div`
   position: relative;
+  min-height: 800px;
   width: 100%;
   flex-grow: 1; /* 남은 공간을 모두 차지 */
 `;

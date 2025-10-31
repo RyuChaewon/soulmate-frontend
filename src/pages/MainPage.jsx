@@ -12,35 +12,36 @@ import rightButtonImg from '../assets/buttons/rightbutton.svg';
 import addButtonImg from '../assets/buttons/addbutton.svg';
 import diaryButtonImg from '../assets/buttons/diarybutton.svg';
 
-// 모든 감정 아이콘 import
-import angryIcon from '../assets/emotions/angry.png';
-import disgustedIcon from '../assets/emotions/disgusted.png';
-import fearIcon from '../assets/emotions/fear.png';
 import happyIcon from '../assets/emotions/happy.png';
-import hateIcon from '../assets/emotions/hate.png';
+import angryIcon from '../assets/emotions/angry.png';
+import anxietyIcon from '../assets/emotions/anxiety.png';
+import neutralIcon from '../assets/emotions/neutral.png';
+import panicIcon from '../assets/emotions/panic.png';
 import sadIcon from '../assets/emotions/sad.png';
-import surprisedIcon from '../assets/emotions/surprised.png';
+import woundIcon from '../assets/emotions/wound.png';
+// --- ↑↑↑ 여기까지 ---
 
-// 감정 이름을 아이콘 파일에 매핑
+// --- ↓↓↓ [수정] 새로운 감정 아이콘 매핑 객체 ↓↓↓ ---
 const emotionIcons = {
   happy: happyIcon,
-  surprised: surprisedIcon,
   angry: angryIcon,
+  anxiety: anxietyIcon,
+  neutral: neutralIcon,
+  panic: panicIcon,
   sad: sadIcon,
-  disgusted: disgustedIcon,
-  hate: hateIcon,
-  fear: fearIcon,
+  wound: woundIcon,
 };
+// --- ↑↑↑ 여기까지 ---
 
-// 서버에서 오는 감정 번호를 감정 이름으로 변환
+// --- ↓↓↓ [수정] 새로운 감정 번호 -> 이름 매핑 객체 ↓↓↓ ---
 const emotionNumberToName = {
   1: 'happy',
-  2: 'surprised',
-  3: 'angry',
-  4: 'sad',
-  5: 'disgusted',
-  6: 'hate',
-  7: 'fear',
+  2: 'angry',
+  3: 'anxiety',
+  4: 'neutral',
+  5: 'panic',
+  6: 'sad',
+  7: 'wound',
 };
 
 function MainPage() {

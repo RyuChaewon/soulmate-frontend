@@ -4,10 +4,9 @@ import styled from 'styled-components';
 export const HeaderContainer = styled.header`
   width: 393px;
   height: 90px;
-  position: fixed;
+  position: absolute;
   top: 0;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
   z-index: 1000;
 `;
 

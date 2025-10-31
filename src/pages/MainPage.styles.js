@@ -96,7 +96,7 @@ export const EmotionRow = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 40px;
+  gap: 25px;
   margin-bottom: 20px;
 `;
 
