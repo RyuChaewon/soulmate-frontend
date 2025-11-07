@@ -61,16 +61,19 @@ function RecordingPage() {
     if (streamIntervalRef.current) clearInterval(streamIntervalRef.current);
     frameSequenceRef.current = 0;
 
+    // --- 👇 [수정] mediaRecorder 중지 시 onstop 핸들러가 재시작되지 않도록 localStreamRef 먼저 null 처리 ---
+    // (순서 중요: localStreamRef를 먼저 null로 만들어 onstop 루프 방지)
+    if (localStreamRef.current) {
+      localStreamRef.current.getTracks().forEach(track => track.stop());
+      localStreamRef.current = null; // onstop 핸들러가 참조할 수 있도록 먼저 null 처리
+    }
+    
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
-      mediaRecorderRef.current.stop();
+      mediaRecorderRef.current.stop(); // 이 stop()이 onstop을 호출하지만, localStreamRef.current가 null이라 재시작 안됨
     }
     mediaRecorderRef.current = null;
     audioSequenceRef.current = 0;
 
-    if (localStreamRef.current) {
-      localStreamRef.current.getTracks().forEach(track => track.stop());
-      localStreamRef.current = null;
-    }
     if (videoRef.current) videoRef.current.srcObject = null;
 
     // TTS 중지 및 아바타 상태 초기화
@@ -113,7 +116,7 @@ function RecordingPage() {
     streamIntervalRef.current = setInterval(() => {
       if (videoRef.current && videoRef.current.videoWidth > 0) {
         ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-        const frameData = canvas.toDataURL('image/jpeg', 0.7).split(',')[1];
+        const frameData = canvas.toDataURL('image/jpeg', 0.4).split(',')[1];
         const frameId = 'frame_' + Date.now() + '_' + frameSequenceRef.current;
         
         socketRef.current.emit('video-frame', { 
@@ -124,11 +127,11 @@ function RecordingPage() {
           sequenceNumber: frameSequenceRef.current++
         });
       }
-    }, 100);
+    }, 150);
     console.log('📹 영상 캡처 시작');
   }, []);
 
-  // --- 5. 음성 녹음 설정 (이전과 동일) ---
+  // --- 5. 음성 녹음 설정 (onstop 핸들러 추가) ---
   const setupAudioCapture = useCallback(() => {
     if (!localStreamRef.current || !socketRef.current) return;
     try {
@@ -156,7 +159,7 @@ function RecordingPage() {
       mediaRecorderRef.current = recorder;
 
       recorder.ondataavailable = (event) => {
-        if (event.data.size > 4000) {
+        if (event.data.size > 0) {
           const reader = new FileReader();
           reader.onloadend = () => {
             if (socketRef.current && socketRef.current.connected) {
@@ -188,12 +191,24 @@ function RecordingPage() {
         }
       };
 
+      // --- 👇 [핵심 수정] 녹음이 멈출 때마다(10초 경과) 재시작 ---
+      recorder.onstop = () => {
+        // localStreamRef.current가 null이면(사용자가 '기록 끝'을 누름) 재시작하지 않음
+        if (localStreamRef.current) { 
+          console.log('🎤 10초 녹음 완료, 다음 10초 녹음 시작...');
+          recorder.start(10000); // 다음 10초 녹음 시작
+        } else {
+          console.log('🎤 녹음 루프 정지 (스트림 종료됨)');
+        }
+      };
+      // --- 👆 여기까지 수정 ---
+
       recorder.start(10000); // 10초마다 데이터 수집 시작
       console.log('🎤 음성 녹음 시작 (10초 간격)');
     } catch (error) {
       console.error(`❌ 음성 캡처 실패: ${error.message}`);
     }
-  }, []);
+  }, []); // 의존성 배열은 그대로 둡니다.
 
   // --- 6. [신규] 아바타 말하기 애니메이션을 위한 useEffect ---
   useEffect(() => {
@@ -219,6 +234,43 @@ function RecordingPage() {
 
   // --- 7. 페이지 로드 useEffect (이전과 동일) ---
   useEffect(() => {
+    const unlockAudioContext = () => {
+      console.log('🔊 오디오 컨텍스트 잠금 해제를 시도합니다.');
+      
+      // getVoices()를 호출하면 음성 목록 로드를 트리거할 수 있습니다.
+      const voices = window.speechSynthesis.getVoices(); 
+
+      const speakDummy = () => {
+        // TTS API가 활성화되었는지 확인
+        if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+          console.log('🔊 TTS가 이미 활성화 대기 중입니다.');
+          return;
+        }
+        
+        // 실제 소리는 나지 않도록 볼륨 0, 내용은 공백으로
+        const dummyUtterance = new SpeechSynthesisUtterance(' ');
+        dummyUtterance.volume = 0;
+        dummyUtterance.lang = 'ko-KR'; // 언어 설정
+        
+        window.speechSynthesis.speak(dummyUtterance);
+        console.log('🔊 (더미 발화 시도 완료)');
+      };
+
+      if (voices.length > 0) {
+        console.log('🔊 (Voices Ready) 즉시 잠금 해제 시도.');
+        speakDummy();
+      } else {
+        console.log('🔊 (Voices Loading) 음성 로드를 대기합니다...');
+        // 음성 목록이 비동기적으로 로드될 경우를 대비
+        window.speechSynthesis.onvoiceschanged = () => {
+          console.log('🔊 (Voices Loaded) 잠금 해제를 시도합니다.');
+          speakDummy();
+          // 리스너는 한 번만 필요하므로 제거
+          window.speechSynthesis.onvoiceschanged = null; 
+        };
+      }
+    };
+    // --- 👆 여기까지 [신규] ---
     const startProcess = async () => {
       socketRef.current = io('https://soulmate.kro.kr/video', {
         transports: ['websocket', 'polling'],
@@ -235,6 +287,12 @@ function RecordingPage() {
 
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        
+        // --- 👇 [핵심 수정] ---
+        // 사용자가 '허용'을 클릭했습니다. 이것이 '사용자 상호작용'입니다!
+        console.log('✅ 미디어 접근 허용됨. (사용자 상호작용 감지)');
+        unlockAudioContext(); // <-- 이 시점에 오디오 잠금을 해제합니다.
+        // --- 👆 여기까지 ---
         localStreamRef.current = stream;
         if (videoRef.current) videoRef.current.srcObject = stream;
         
