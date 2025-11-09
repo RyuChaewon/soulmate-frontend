@@ -191,20 +191,19 @@ function RecordingPage() {
         }
       };
 
-      // --- 👇 [핵심 수정] 녹음이 멈출 때마다(10초 경과) 재시작 ---
       recorder.onstop = () => {
         // localStreamRef.current가 null이면(사용자가 '기록 끝'을 누름) 재시작하지 않음
         if (localStreamRef.current) { 
-          console.log('🎤 10초 녹음 완료, 다음 10초 녹음 시작...');
-          recorder.start(10000); // 다음 10초 녹음 시작
+          console.log('🎤 5초 녹음 완료, 다음 5초 녹음 시작...');
+          recorder.start(5000); // 다음 10초 녹음 시작
         } else {
           console.log('🎤 녹음 루프 정지 (스트림 종료됨)');
         }
       };
       // --- 👆 여기까지 수정 ---
 
-      recorder.start(10000); // 10초마다 데이터 수집 시작
-      console.log('🎤 음성 녹음 시작 (10초 간격)');
+      recorder.start(5000); // 5초마다 데이터 수집 시작
+      console.log('🎤 음성 녹음 시작 (5초 간격)');
     } catch (error) {
       console.error(`❌ 음성 캡처 실패: ${error.message}`);
     }
