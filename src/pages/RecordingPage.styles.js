@@ -55,3 +55,43 @@ export const EndRecordingButtonWrapper = styled.div`
   height: 80px;
   cursor: pointer;
 `;
+
+// --- 👇 [신규] 아바타 말풍선 스타일 ---
+
+export const AvatarSpeechBubble = styled.div`
+  position: absolute;
+  top: 15px; // AvatarVideoWrapper 상단에서 15px 아래
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%; // 래퍼 너비의 90%
+  max-width: 350px;
+  
+  background: rgba(255, 255, 255, 0.9); // 반투명 흰색 배경
+  color: #333; // 어두운 텍스트 색상
+  border-radius: 12px;
+  padding: 12px 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+  
+  font-size: 1rem;
+  line-height: 1.5;
+  text-align: center;
+  
+  // 텍스트가 길어질 경우 스크롤
+  max-height: 100px; // 약 4~5줄 높이
+  overflow-y: auto;
+  
+  // 말풍선 꼬리
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -10px; // 버블 아래쪽
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid rgba(255, 255, 255, 0.9); // 버블 배경색과 동일
+  }
+`;
