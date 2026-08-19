@@ -4,14 +4,15 @@ import { Link, useNavigate } from 'react-router-dom';
 import * as S from './MainPage.styles';
 import Layout from '../components/Layout/Layout';
 import Calendar from '../components/Calendar';
-import { authFetch } from '../api'; // API 통신 헬퍼
+import { authFetch } from '../api';
 
-// 필요한 이미지 import
+// 화면에 사용하는 버튼 이미지
 import leftButtonImg from '../assets/buttons/leftbutton.svg';
 import rightButtonImg from '../assets/buttons/rightbutton.svg';
 import addButtonImg from '../assets/buttons/addbutton.svg';
 import diaryButtonImg from '../assets/buttons/diarybutton.svg';
 
+// 감정 아이콘
 import happyIcon from '../assets/emotions/happy.png';
 import angryIcon from '../assets/emotions/angry.png';
 import anxietyIcon from '../assets/emotions/anxiety.png';
@@ -19,9 +20,7 @@ import neutralIcon from '../assets/emotions/neutral.png';
 import panicIcon from '../assets/emotions/panic.png';
 import sadIcon from '../assets/emotions/sad.png';
 import woundIcon from '../assets/emotions/wound.png';
-// --- ↑↑↑ 여기까지 ---
 
-// --- ↓↓↓ [수정] 새로운 감정 아이콘 매핑 객체 ↓↓↓ ---
 const emotionIcons = {
   happy: happyIcon,
   angry: angryIcon,
@@ -31,9 +30,7 @@ const emotionIcons = {
   sad: sadIcon,
   wound: woundIcon,
 };
-// --- ↑↑↑ 여기까지 ---
 
-// --- ↓↓↓ [수정] 새로운 감정 번호 -> 이름 매핑 객체 ↓↓↓ ---
 const emotionNumberToName = {
   1: 'happy',
   2: 'angry',
@@ -52,7 +49,7 @@ function MainPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [topEmotions, setTopEmotions] = useState([]);
 
-  // 월이 바뀔 때마다 실행되는 월별 데이터 로딩
+  // 월이 바뀔 때마다 해당 월의 일기 데이터를 불러옵니다.
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -67,13 +64,12 @@ function MainPage() {
         const month = String(currentDate.getMonth() + 1).padStart(2, '0');
         const data = await authFetch(`/diaries/month?year=${year}&month=${month}`);
         
-        // --- ↓↓↓ 이 데이터 처리 부분을 수정했습니다 ↓↓↓ ---
+        // 캘린더에서 표시할 날짜별 대표 감정 정보를 구성합니다.
         const records = data.reduce((acc, diary) => {
           const day = new Date(diary.date).getDate();
-          // emotionData 배열이 있고, 그 안에 요소가 있을 경우에만 처리
           if (diary.emotionData && diary.emotionData.length > 0) {
             const mainEmotionId = diary.emotionData[0].emotion;
-            acc[day] = emotionNumberToName[mainEmotionId]; // 대표 감정 번호를 이름으로 변환하여 저장
+            acc[day] = emotionNumberToName[mainEmotionId];
           }
           return acc;
         }, {});
@@ -97,9 +93,8 @@ function MainPage() {
     setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
   };
   
-  // 날짜 클릭 시 실행되는 일별 상세 데이터 로딩
+  // 날짜를 선택하면 해당 일자의 상세 감정 데이터를 불러옵니다.
   const handleDayClick = useCallback(async (day, record) => {
-    // 같은 날짜를 다시 클릭하면 선택 해제
     if (selectedDayData && selectedDayData.day === day) {
       setSelectedDayData(null);
       setTopEmotions([]);
@@ -110,14 +105,14 @@ function MainPage() {
     
     if (day && record) {
       try {
-        setTopEmotions([]); // 감정 로딩 중 상태를 위해 초기화
+        setTopEmotions([]);
         const year = currentDate.getFullYear();
         const month = String(currentDate.getMonth() + 1).padStart(2, '0');
         const date = String(day).padStart(2, '0');
         
         const dailyData = await authFetch(`/diaries/date?year=${year}&month=${month}&date=${date}`);
         
-        // emotionData 배열에서 감정 번호를 이름으로 변환하여 상위 3개 저장
+        // 상세 영역에는 상위 3개 감정을 표시합니다.
         const emotions = dailyData.emotionData
           .map(e => emotionNumberToName[e.emotion])
           .slice(0, 3);
@@ -188,7 +183,7 @@ function MainPage() {
               </Link>
             </S.AddButtonWrapper>
           ) : (
-            <></> // 아무것도 선택하지 않은 초기 상태
+            <></>
           )}
         </S.BottomContainer>
       </S.PageContainer>
