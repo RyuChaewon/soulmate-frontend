@@ -5,9 +5,9 @@ import { io } from 'socket.io-client';
 import Layout from '../components/Layout/Layout';
 import * as S from './RecordingPage.styles';
 
-// 아바타 이미지 두 가지 불러오기
+// 아바타 이미지
 import avatarIcon from '../assets/icons/avatar.svg';
-import avatar2Icon from '../assets/icons/avatar_2.svg'; // 아바타가 말할 때 사용할 이미지
+import avatar2Icon from '../assets/icons/avatar_2.svg';
 import endRecordingButtonImg from '../assets/buttons/endrecordingbutton.svg';
 
 function RecordingPage() {
@@ -45,7 +45,7 @@ function RecordingPage() {
     window.speechSynthesis.speak(utterance);
   }, []);
 
-  // --- [수정됨] 1. 세션 종료 버그 해결 ---
+  // 스트림과 소켓 세션을 정리합니다.
   const stopAllStreams = useCallback(() => {
     console.log('--- 🛑 모든 스트림과 연결을 중지합니다 ---');
 
@@ -74,7 +74,7 @@ function RecordingPage() {
       if (sessionIdRef.current) {
         console.log(`[Socket] 'stop-video-stream' 이벤트 전송: sessionId=${sessionIdRef.current}, userId=${userId}`);
         
-        // DTO에 'reason'이 Optional이므로 포함
+        // 종료 사유는 서버 DTO의 선택 필드입니다.
         socketRef.current.emit('stop-video-stream', { 
           sessionId: sessionIdRef.current, 
           userId: userId,
@@ -82,16 +82,14 @@ function RecordingPage() {
         });
       }
       
-      // --- ❗️ [핵심 수정] ❗️ ---
-      // ❗️ emit() 메시지가 전송될 시간을 주기 위해 이 두 줄을 반드시 제거(주석 처리)해야 합니다.
+      // stop 이벤트가 전송된 뒤 cleanup effect에서 연결을 종료합니다.
       // socketRef.current.disconnect(); 
       // socketRef.current = null;
-      // ---
     }
     sessionIdRef.current = null;
-  }, [userId]); // userId 의존성 추가
+  }, [userId]);
 
-  // --- 4. 영상 캡쳐 (DTO에 맞춤) ---
+  // 영상 프레임을 캡처해 서버 DTO 형식으로 전송합니다.
   const startFrameCapture = useCallback(() => {
     if (!localStreamRef.current || !socketRef.current || !videoRef.current) return;
     
@@ -103,7 +101,7 @@ function RecordingPage() {
     
     console.log(`[Socket] 'start-video-stream' 이벤트 전송: sessionId=${tempSessionId}, userId=${userId}`);
     
-    // DTO(StartVideoStreamDto) 규격에 맞춤
+    // StartVideoStreamDto 규격에 맞춰 스트림 정보를 전송합니다.
     socketRef.current.emit('start-video-stream', {
       sessionId: tempSessionId, 
       userId: userId,
@@ -124,7 +122,7 @@ function RecordingPage() {
         const frameData = canvas.toDataURL('image/jpeg', 0.4).split(',')[1];
         const frameId = 'frame_v_' + Date.now() + '_' + frameSequenceRef.current;
         
-        // DTO(VideoFrameDto) 규격에 맞춤
+        // VideoFrameDto 규격에 맞춰 프레임을 전송합니다.
         socketRef.current.emit('video-frame', { 
           sessionId: sessionIdRef.current,
           frameId: frameId,
@@ -137,7 +135,7 @@ function RecordingPage() {
     console.log('📹 영상 캡처 시작');
   }, [userId]);
 
-  // --- 5. 음성 녹음 설정 (DTO에 맞춤) ---
+  // 음성 데이터를 일정 간격으로 녹음해 서버 DTO 형식으로 전송합니다.
   const setupAudioCapture = useCallback(() => {
     if (!localStreamRef.current || !socketRef.current) return;
     try {
@@ -179,7 +177,7 @@ function RecordingPage() {
               
               const audioFrameId = 'audio_' + Date.now() + '_' + audioSequenceRef.current;
               
-              // DTO(AudioFrameDto) 규격에 맞춤
+              // AudioFrameDto 규격에 맞춰 오디오 조각을 전송합니다.
               socketRef.current.emit('audio-frame', {
                 sessionId: sessionIdRef.current,
                 frameId: audioFrameId,
@@ -213,7 +211,7 @@ function RecordingPage() {
     }
   }, []);
 
-  // --- 6. 아바타 말하기 애니메이션 useEffect ---
+  // 아바타가 말하는 동안 이미지 전환 애니메이션을 적용합니다.
   useEffect(() => {
     let animationInterval = null;
     
@@ -232,7 +230,7 @@ function RecordingPage() {
     };
   }, [isAvatarSpeaking]);
 
-  // --- 7. [수정됨] 페이지 로드 useEffect (STT 오류 해결) ---
+  // 페이지 진입 시 소켓과 미디어 스트림을 준비합니다.
   useEffect(() => {
     const unlockAudioContext = () => {
       const voices = window.speechSynthesis.getVoices(); 
@@ -261,7 +259,7 @@ function RecordingPage() {
         if(data.sessionId) sessionIdRef.current = data.sessionId;
       });
 
-      // (실시간 일기/조언 리스너)
+      // 실시간 일기와 조언 응답을 수신합니다.
       let diaryTextBuffer = '';
       socketRef.current.on('diary-stream-start', () => {
         diaryTextBuffer = '';
@@ -299,8 +297,7 @@ function RecordingPage() {
       socketRef.current.on('exception', (err) => console.error('❌ [ON] exception (서버 오류)', err));
 
       try {
-        // --- ❗️ [핵심 수정] ❗️ ---
-        // ❗️ 오디오 샘플링 속도를 48000Hz로 강제합니다.
+        // 서버 STT 처리를 위해 48kHz 단일 채널 오디오를 요청합니다.
         const stream = await navigator.mediaDevices.getUserMedia({ 
           video: { width: 640, height: 480 },
           audio: {
@@ -309,7 +306,7 @@ function RecordingPage() {
           }
         });
 
-        // ❗️ 실제 적용된 설정 확인용 로그
+        // 브라우저가 실제로 적용한 오디오 설정을 확인합니다.
         const audioSettings = stream.getAudioTracks()[0].getSettings();
         console.log('🎤 실제 적용된 오디오 설정:', audioSettings); 
 
@@ -329,8 +326,8 @@ function RecordingPage() {
     startProcess();
 
     return () => {
-      // 컴포넌트가 사라질 때 (페이지 이동 시) 실행되는 정리 함수
-      stopAllStreams(); // ❗️ 버그가 수정된 stopAllStreams 호출
+      // 페이지를 떠날 때 로컬 리소스와 소켓 연결을 정리합니다.
+      stopAllStreams();
       if (socketRef.current) {
         socketRef.current.disconnect();
         socketRef.current = null;
@@ -338,10 +335,10 @@ function RecordingPage() {
     };
   }, [date, navigate, speak, setupAudioCapture, startFrameCapture, stopAllStreams, userId]);
 
-  // --- 8. '기록 끝' 버튼 핸들러 (UI 변경 없음) ---
+  // 녹화를 종료하고 결과 화면으로 이동합니다.
   const handleEndRecording = () => {
-    stopAllStreams(); // 1. 서버에 "일기 생성" 요청 (버그 수정됨)
-    navigate(`/after-record/${date}`); // 2. (요청대로) 즉시 이동
+    stopAllStreams();
+    navigate(`/after-record/${date}`);
   };
 
   return (
